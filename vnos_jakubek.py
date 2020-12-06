@@ -109,7 +109,7 @@ def convert_to_number(data):
     result = (data[1] + (256 * data[0])) / 1.2
     return result
 
-# Save measurements into the database
+# Save measurements into the database in an infinite loop
 def db_loop(name):
     logging.debug("Thread %s starting ...", name)
     
@@ -122,6 +122,21 @@ def db_loop(name):
             db_cur.execute("INSERT INTO measurements (datetime, room_temp, water_temp, light_level) VALUES (datetime('now', 'localtime'), ?, ?, ?)",
                            (temp1, temp2, ll))
         time.sleep(5) # Update only once every 5 seconds
+
+# Display in an infinite loop
+def disp_loop(name):
+    logging.debug("Thread %s starting ...", name)
+    
+    # Wait until initial measurements are taken
+    time.sleep(5)
+    
+    while not stop_threads:
+        temp_str = format(temp2, ".2f").zfill(2)
+        Pi7SegPy.show([
+            int(temp_str[0]),
+            int(temp_str[1]),
+            int(temp_str[3]),
+            int(temp_str[4])], [3])
 
 @route("/get_data")
 def get_data():
@@ -155,7 +170,7 @@ def get_all_data():
     data = db_cur.fetchall()
     return json.dumps(data)
 
-# Updates RGB LED color in an infinite loop
+# Update RGB LED color in an infinite loop
 def led_loop(name):
     logging.debug("Thread %s starting ...", name)
     global temp2
@@ -178,7 +193,7 @@ def led_loop(name):
             GPIO.output(led_blue_pin, GPIO.LOW)
         time.sleep(1) # Update only once a second
 
-# Returns contents of the specified file in lines
+# Return contents of the specified file in lines
 def read_file(file_path):
     f = open(file_path, 'r')
     lines = f.readlines()
@@ -191,7 +206,7 @@ def read_light(addr = ls_i2c_address):
     data = ls_bus.read_i2c_block_data(addr, ls_one_time_high_res_mode_2)
     return convert_to_number(data)
 
-# Reads measured values in an infinite loop
+# Read measured values in an infinite loop
 def read_loop(name):
     logging.debug("Thread %s starting ...", name)
     global temp1
@@ -292,6 +307,9 @@ def main():
     # Start saving measurements into the database
     db_thr = threading.Thread(target = db_loop, args = (3,), daemon = True)
     db_thr.start()
+    # Start displaying
+    disp_thr = threading.Thread(target = disp_loop, args = (4,), daemon = True)
+    disp_thr.start()
     
     # Start a HTTP server (0.0.0.0 to listen on all interfaces)
     run(host = "0.0.0.0", port = 8080)
