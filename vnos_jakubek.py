@@ -131,12 +131,35 @@ def disp_loop(name):
     time.sleep(5)
     
     while not stop_threads:
-        temp_str = format(temp2, ".2f").zfill(2)
-        Pi7SegPy.show([
-            int(temp_str[0]),
-            int(temp_str[1]),
-            int(temp_str[3]),
-            int(temp_str[4])], [3])
+        if water_temp_mode:
+            temp_str = format(temp2, ".2f").zfill(5)
+            Pi7SegPy.show([
+                int(temp_str[0]),
+                int(temp_str[1]),
+                int(temp_str[3]),
+                int(temp_str[4])], [3])
+        elif room_temp_mode:
+            temp_str = format(temp1, ".2f").zfill(5)
+            Pi7SegPy.show([
+                int(temp_str[0]),
+                int(temp_str[1]),
+                int(temp_str[3]),
+                int(temp_str[4])], [3])
+        elif light_level_mode:
+            if ll >= 1000:
+                temp_str = format(ll, ".0f")
+                Pi7SegPy.show([
+                    int(temp_str[0]),
+                    int(temp_str[1]),
+                    int(temp_str[2]),
+                    int(temp_str[3])])
+            else:
+                temp_str = format(ll, ".1f").zfill(5)
+                Pi7SegPy.show([
+                    int(temp_str[0]),
+                    int(temp_str[1]),
+                    int(temp_str[2]),
+                    int(temp_str[4])], [2])
 
 @route("/get_data")
 def get_data():
