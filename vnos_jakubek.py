@@ -31,7 +31,7 @@ ls_one_time_low_res_mode = 0x23 # 4lx resolution. Time typically 16ms
 ls_one_time_high_res_mode_1 = 0x20 # 1lx resolution. Time typically 120ms
 ls_one_time_high_res_mode_2 = 0x21 # 0.5lx resolution. Time typically 120ms
 # Other light sensor variables
-ls_i2c_address = 0x23
+ls_i2c_address = 0x23 # ADDR pin is connedted to GND
 ls_bus = smbus.SMBus(1)
 
 # 7-segment display variables (GPIO in BCM numbering)
@@ -49,7 +49,7 @@ btn_initialized = False
 # RGB LED variables (GPIO in BCM numbering)
 led_red_pin = 21 # GPIO pin connected to R
 led_green_pin = 20 # GPIO pin connected to G
-led_blue_pin = 16 # GPIO connected to B
+led_blue_pin = 16 # GPIO pin connected to B
 led_initialized = False
 
 # Database variables
